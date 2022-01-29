@@ -2,13 +2,13 @@
 
 ```js
 // Your code
-function resolve() {
-    return new Promise((resolve,reject) => {
-        setTimeout(() => resolve(`Promise Resolved!`),1000)
-    })
-}
 
-resolve().then((data) => console.log(data));
+let res = new Promise((resolve,reject) => {
+    setTimeout(() => resolve(`Promise Resolved!`),1000)
+})
+
+
+res.then(console.log);
 ```
 
 2. Create another promise. Now have it reject with a value of `Rejected Promise!` without using `setTimeout`. Print the contents of the promise after it has been rejected by passing console.log to `.catch`
@@ -19,18 +19,17 @@ function rej() {
     return Promise.reject(`Rejected Promise!`)
 }
 
-rej().catch((data) => console.log(data));
+rej().catch(console.log);
 ```
 
 3. Create another promise. Now have it reject with a value of `Rejected Promise!` without using `setTimeout`. Print the contents of the promise after it has been rejected by passing console.log to `.catch` and also use `.finally` to log message `Promise Settled!`.
 
 ```js
 // Your code
-function rej() {
-    return Promise.reject(`Rejected Promise!`)
-}
 
-rej().catch((data) => console.log(data)).finally(() => console.log(`Promise Settled!`));
+let rej = new Promise((resolve,reject) => reject("Rejected Promsie!"));
+
+rej.catch(console.log).finally(() => console.log(`Promise Settled!`));
 ```
 
 4. What will be the output of the code below.
@@ -55,7 +54,7 @@ console.log('D');
 // Your code
 function wait(time) {
     return new Promise((resolve,reject) => {
-        setTimeout(resolve(`Promise Resolved!`),time)
+        setTimeout(() => resolve(`Promise Resolved!`),time)
     })
 }
 
@@ -73,9 +72,13 @@ wait(4000).then((data) => console.log(data))
 
 ```js
 // Your code
-Promise.resolve(21).then((no) => no+10).then((no) => no+100).then((no) => {
+let promise = new Promise((res,rej) => {
+    res(21);
+}).then((no) => no+10)
+.then((no) => no+100)
+.then((no) => {
     if (no>100) {
-        throw `No. greater than 100`
+        throw new Error(`No. greater than 100`)
     }
 }).catch((error) => console.log(error));
 ```
@@ -91,11 +94,10 @@ Promise.resolve(21).then((no) => no+10).then((no) => no+100).then((no) => {
 ```js
 // Your code
 Promise.resolve(['A']).then((data) => data.concat(['B'])).then((data) => {
-    let obj = {};
-    for(let i=0;i<data.length;i++) {
-        obj[i] = data[i]
-    };
-    return obj;
+    return data.reduce((acc,cv,i) => {
+        acc[i] = cv;
+        return acc;
+    }, {});
 }).then((data) => console.log(data))
 ```
 
