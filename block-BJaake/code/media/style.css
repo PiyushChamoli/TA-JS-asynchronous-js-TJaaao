@@ -76,7 +76,6 @@ header {
     margin: 55px 10px;
     font-size: 17px;
     padding: 3px 10px;
-    width: 150px;
     text-align: center;
 }
 
@@ -123,4 +122,8 @@ header {
     color: white;
     padding: 4px 10px;
     font-weight: 500;
+}
+
+.news button:hover {
+    cursor: pointer;
 }
