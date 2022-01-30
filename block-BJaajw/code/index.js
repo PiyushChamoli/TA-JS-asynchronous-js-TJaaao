@@ -2,7 +2,21 @@ let url = `https://api.spaceflightnewsapi.net/v3/articles?_limit=30`;
 
 let newsElm = document.querySelector('.news');
 let selectElm = document.querySelector('select');
+let main = document.querySelector('.main');
+let errorElm = document.querySelector('.error-message');
 let allNews = [];
+
+function handleErrorMessage(message = 'Something Went Wrong..') {
+    main.style.display = 'none';
+    errorElm.style.display = 'block';
+    errorElm.innerText = message;
+}
+
+function handleSpinner(status = false) {
+    if (status) {
+        newsElm.innerHTML = `<div class="donut"></div>`; 
+    }
+}
 
 function renderNews(news) {
     newsElm.innerHTML = '';
@@ -36,18 +50,26 @@ function displayOptions(sources) {
     })
 } 
 
-fetch(url)
-.then((res) => res.json())
-.then((news) => {
-    renderNews(news);
-    allNews = news;
-    let allSources = Array.from(new Set(news.map(n => n.newsSite)));
-    displayOptions(allSources);
-}).catch(() => {
-    let h2 = document.createElement('h2');
-    h2.innerText = 'Something Went Wrong...';
-    newsElm.append(h2);
-}) 
+function init() {
+    handleSpinner(true);
+    fetch(url)
+    .then((res) => {
+        if (res.ok) {
+            return res.json();
+        } else {
+            throw new Error('Response not okay!');
+        }
+    })
+    .then((news) => {
+        handleSpinner();
+        renderNews(news);
+        allNews = news;
+        let allSources = Array.from(new Set(news.map(n => n.newsSite)));
+        displayOptions(allSources);
+    }).catch((error) => {
+        handleErrorMessage(error);
+    }).finally(() => handleSpinner());
+}
 
 selectElm.addEventListener('change', (event) => {
     let source = event.target.value.trim();
@@ -58,3 +80,9 @@ selectElm.addEventListener('change', (event) => {
     }
     renderNews(filteredNews);
 })
+
+if (navigator.onLine) {
+    init();
+} else {
+    handleErrorMessage();
+}
