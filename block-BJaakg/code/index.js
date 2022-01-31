@@ -1,33 +1,62 @@
-const sourceURL = `https://www.anapioficeandfire.com/api/books`;
 
-let ul = document.querySelector('ul');
-let pop = document.querySelector('.pop-up');
+let booksURL = 'https://www.anapioficeandfire.com/api/books';
 
-function handleCharacters(characters) {
-    console.log(characters);
-    characters.forEach((url) => {
-        let li = document.createElement('li');
-        let name = fetch(url).then(res => res.json()).then(ch => ch.name);
-        name.then(nam => li.append(nam));
-        pop.style.display = 'block';
-        pop.append(li);
+let modalWindow = document.querySelector('.modal-window');
+let modalClose = document.querySelector('.modal-close');
+let openBtn = document.querySelector('.btn');
+let booksUL = document.querySelector('.book-list');
+let charactersUL = document.querySelector('.characters');
+
+function handleSpinner(rootElm, status=false) {
+    if (status) {
+        rootElm.innerHTML = `<div class="donut"></div>`;
+    }
+}
+
+function displayCharacters(characters) {
+    handleSpinner(charactersUL,true);
+    Promise.all(characters.map(character => fetch(character).then(res => res.json())))
+    .then((charactersData) => {
+        charactersUL.innerHTML = '';
+        charactersData.forEach(ch => {
+            let li = document.createElement('li');
+            li.innerText = `${ch.name} (${ch.aliases.join(' ')})`;
+            charactersUL.append(li);
+        })
     })
 }
 
-function displayUI(data) {
-    console.log(data)
+function displayBooks(data) {
+    booksUL.innerHTML = '';
     data.forEach(book => {
         let li = document.createElement('li');
-        let h2 = document.createElement('h2');
+        let h3 = document.createElement('h3');
+        h3.innerText = book.name;
         let p = document.createElement('p');
+        p.innerText = book.authors.join(' ');
         let button = document.createElement('button');
-        h2.innerText = book.name;
-        p.innerText = book.authors[0];
-        button.innerText = `Show Characters ${book.characters.length}`
-        button.addEventListener('click', () => handleCharacters(book.characters));
-        li.append(h2,p,button);
-        ul.append(li);
+        button.innerText = `Show Characters (${book.characters.length})`;
+        button.addEventListener('click', () => {
+            console.log('click');
+            displayCharacters(book.characters);
+            modalWindow.style.display = 'block';
+            modalWindow.querySelector('.modal-close').addEventListener('click', () => {
+            modalWindow.style.display = 'none';
+            });
+        })
+        li.append(h3,p,button);
+        booksUL.append(li);
     });
 }
 
-fetch(sourceURL).then(data=> data.json()).then(data => displayUI(data))
+function fetchBooks() {
+    handleSpinner(booksUL,true);
+    fetch(booksURL)
+    .then(res => res.json())
+    .then((booksData) => displayBooks(booksData))
+    .finally(() => handleSpinner(booksUL));
+}
+
+fetchBooks();
+
+
