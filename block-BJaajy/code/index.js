@@ -7,6 +7,16 @@ const four = new Promise((resolve,reject) => setTimeout(() => resolve(4),4000));
 
 Promise.all([one,two,three,four]).then(console.log);
 
+//OR
+
+let times = [1,2,3,4];
+let timesPromise = times.map(
+    (second) => new Promise((res) => {
+        setTimeout(() => res(Math.random()), second*1000);
+    })
+);
+Promise.all(timesPromise).then(console.log);
+
 // - Create a list of 5 Github usernames in an array and using `Promise.all` get access to the data of each user from GitHub API. Log the number of followers of each user.
 
 const githubUsers = ["kabir4691","vaibhavmule","minhd-nguyen","mountainfirefly","mammothgazillionaire"];
@@ -23,8 +33,8 @@ const githubUsersFollowers = Promise.all(
 //   - https://random.dog/woof.json
 //   - https://aws.random.cat/meow
 
-const dog = new Promise(res => res(fetch(`https://random.dog/woof.json`)));
-const cat = new Promise(res => res(fetch(`https://aws.random.cat/meow`)));
+const dog = fetch(`https://random.dog/woof.json`).then(res => res.json());
+const cat = fetch(`https://aws.random.cat/meow`).then(res => res.json());
 
 Promise.race([dog,cat]).then(value => console.log(value));
 
