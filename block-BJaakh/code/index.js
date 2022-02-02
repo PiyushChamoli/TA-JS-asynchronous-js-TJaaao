@@ -1,7 +1,7 @@
 const url = 'https://sleepy-falls-37563.herokuapp.com/api/todo';
 
 let rootUL = document.querySelector('.todo-list');
-let inputElm = document.querySelector();
+let inputElm = document.querySelector('input');
 
 function handleDelete(id) {
     fetch(url + `/${id}`, {
@@ -27,7 +27,31 @@ function handleToggle(id, status) {
     }).then(() => fetchTodos());
 }
 
+function handleEdit(event,id,title) {
+    let input = document.createElement('input');
+    input.value = title;
+    let p = event.target;
+    let parentElm = event.target.parentElement;
+    parentElm.replaceChild(input,p);
 
+    input.addEventListener('keyup', (event) => {
+        if (event.keyCode === 13 && event.target.value) {
+            let data = {
+                todo: {
+                    title: event.target.value;
+                }
+            }
+
+            fetch(url + `/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'appplication/json'
+                },
+                body: JSON.stringify(data)
+            }).then(() => fetchTodos());
+        }
+    })
+}
 
 function createUI(todos) {
     rootUL.innerHTML = '';
